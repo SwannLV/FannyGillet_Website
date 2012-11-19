@@ -1,0 +1,175 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<title>Fanny Gillet</title>
+		<style>
+			html, body {
+				height: 100%;
+			}
+
+			body {
+				background-color: #000000;
+				margin: 0;
+				font-family: Arial;
+				overflow: hidden;
+			}
+
+			a {
+				color: #ffffff;
+			}
+
+			#menu {
+				position: absolute;
+				top: 20px;
+				width: 100%;
+				text-align: center;
+			}
+
+			button {
+				color: rgba(127,255,255,0.75);
+				background: transparent;
+				outline: 1px solid rgba(127,255,255,0.75);
+				border: 0px;
+				padding: 5px 10px;
+				cursor: pointer;
+			}
+			button:hover {
+				background-color: rgba(0,255,255,0.5);
+			}
+			button:active {
+				color: #000000;
+				background-color: rgba(0,255,255,0.75);
+			}
+		</style>
+	</head>
+	<body>
+		<script src="three.min.js"></script>
+
+		<div id="container"></div>
+		<div id="menu">
+			<button id="menu1">FANNY</button>
+			<button id="menu2">GILLET</button>
+			<button id="menu3">FANNY GILLET</button>
+			<button id="menu4">GILLET FANNY</button>
+
+		<script>
+
+			var camera, scene, renderer;
+            var angularSpeed = 0.1; // revolutions per second
+            var lastTime = 0;
+
+            window.onload = function(){
+    			init();
+    			animate();
+            }
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.z = 1800;
+
+				scene = new THREE.Scene();
+
+                // HELIX			
+    			//var vector = new THREE.Vector3();
+                var geometry1 = new THREE.Geometry();
+                var geometry2 = new THREE.Geometry();
+                var size = 50;
+                var rotUnit = 200;
+                var top = 1000;
+                var heightUnit = 90;
+                var angleUnit = 0.3;
+
+				for ( var i = 0; i < 24; i ++ ) {
+
+					var phi = i * angleUnit + Math.PI/2;
+
+					var ball1 = new THREE.Mesh(new THREE.SphereGeometry(size, size, size, 30), new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ));
+					ball1.position.x = rotUnit * Math.sin( phi );
+					ball1.position.y = - ( i * heightUnit ) + top;
+					ball1.position.z = rotUnit * Math.cos( phi );
+                    scene.add(ball1);
+                    geometry1.vertices.push( ball1.position );
+                    
+                    var ball2 = new THREE.Mesh(new THREE.SphereGeometry(size, size, size, 30), new THREE.MeshPhongMaterial({ color: 0x0FFFFF }));
+    				ball2.position.x = rotUnit * Math.sin( phi - Math.PI);
+					ball2.position.y = - ( i * heightUnit ) + top;
+					ball2.position.z = rotUnit * Math.cos( phi - Math.PI);
+                    scene.add(ball2);
+                    geometry2.vertices.push( ball2.position );
+                    
+                    var geometry = new THREE.Geometry();
+                    geometry.vertices.push( ball1.position );
+                    geometry.vertices.push( ball2.position );
+                    var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1 } ) );
+        		    scene.add( line );
+
+                }
+                
+                var line1 = new THREE.Line( geometry1, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1 } ) );
+    			scene.add( line1 );
+                var line2 = new THREE.Line( geometry2, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1 } ) );
+        		scene.add( line2 );
+				//
+                
+                // LIGHT
+                var light = new THREE.PointLight(0xffffff);
+            	light.position.set(500,150,1500);
+            	scene.add(light);
+                var light = new THREE.PointLight(0xffffff);
+                light.position.set(-500,150,-1500);
+            	scene.add(light);
+
+				renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.domElement.style.position = 'absolute';
+				document.getElementById( 'container' ).appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+            var angle=0;
+            function animate(){//lastTime, angularSpeed, three){
+                // update
+                var date = new Date();
+                var time = date.getTime();
+                
+                angle = (angle + 0.001) % (2*Math.PI);
+                camera.position.x = 1800 * Math.sin( angle );
+				//camera.position.y = - ( i * heightUnit ) + top;
+				camera.position.z = 1800 * Math.cos( angle );
+                camera.lookAt(scene.children[30].position);
+                //var timeDiff = time - lastTime;
+                //var angleChange = angularSpeed * timeDiff * 2 * Math.PI / 1000;
+                
+               // three.cylinder.rotation.x += angleChange;
+                //lastTime = time;
+         
+                // render
+                renderer.render(scene, camera);
+         
+                // request new frame
+               /* requestAnimationFrame( function(){
+                    animate(lastTime, angularSpeed, three);
+                });*/
+                /*requestAnimFrame(function(){
+                    animate(lastTime, angularSpeed, three);
+                });*/
+                requestAnimationFrame(animate);
+            }
+
+		</script>
+	</body>
+</html>
